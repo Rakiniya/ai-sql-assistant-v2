@@ -14,18 +14,24 @@ def generate_sql(question, table_name, columns):
     prompt = f"""
 You are an expert PostgreSQL SQL generator.
 
-Table Name:
+Database Table:
 {table_name}
 
-Columns:
+Available Columns:
 {', '.join(columns)}
 
 Rules:
-- Use ONLY the table name exactly as provided.
-- Use ONLY the columns listed above.
-- Never invent columns.
-- Generate ONLY PostgreSQL SELECT queries.
-- Return SQL only.
+1. Use ONLY the table name: {table_name}
+2. Use ONLY the columns listed above.
+3. Never invent column names.
+4. Generate ONLY PostgreSQL SELECT queries.
+5. Return ONLY SQL. Do not explain anything.
+6. Use LIMIT when the user asks for top records.
+7. If the question cannot be answered with the available columns, return:
+   ERROR: Required column not found.
+
+User Question:
+{question}
 """
 
     response = model.generate_content(prompt)
