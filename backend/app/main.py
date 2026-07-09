@@ -1,0 +1,20 @@
+from fastapi import FastAPI
+from sqlalchemy import text
+from app.models.database import engine
+from app.routes.upload import router as upload_router
+from app.routes.chat import router as chat_router
+
+app = FastAPI()
+
+app.include_router(upload_router)
+app.include_router(chat_router)
+
+@app.get("/")
+def home():
+    return {"message": "AI SQL Assistant Backend is Running!"}
+
+@app.get("/test-db")
+def test_db():
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+    return {"message": "Database Connected Successfully!"}
