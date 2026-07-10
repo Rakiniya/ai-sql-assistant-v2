@@ -1,8 +1,11 @@
 # Python
+backend/venv/
 venv/
 __pycache__/
+*.pyc
 
 # React
+frontend/node_modules/
 node_modules/
 dist/
 
@@ -13,10 +16,12 @@ backend/.env
 frontend/.env
 
 # Uploads
-uploads/
+backend/uploads/
 
-# VS Code
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
 .vscode/
-
-# Python cache
-*.pyc
+.idea/
