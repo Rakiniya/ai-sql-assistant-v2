@@ -1,0 +1,22 @@
+# Python
+venv/
+__pycache__/
+
+# React
+node_modules/
+dist/
+
+# Environment
+.env
+*.env
+backend/.env
+frontend/.env
+
+# Uploads
+uploads/
+
+# VS Code
+.vscode/
+
+# Python cache
+*.pyc
