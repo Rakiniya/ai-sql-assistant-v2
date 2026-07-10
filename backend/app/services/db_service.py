@@ -50,20 +50,35 @@ def insert_data(table_name, dataframe):
             conn.execute(query, row.to_dict())
 
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from fastapi import HTTPException
+
 
 def execute_query(sql):
 
-    with engine.begin() as conn:
+    try:
+        with engine.begin() as conn:
 
-        result = conn.execute(text(sql))
+            result = conn.execute(text(sql))
 
-        rows = result.fetchall()
+            rows = result.fetchall()
+            columns = result.keys()
 
-        columns = result.keys()
+            data = []
 
-        data = []
+            for row in rows:
+                data.append(dict(zip(columns, row)))
 
-        for row in rows:
-            data.append(dict(zip(columns, row)))
+            return data
 
-        return data            
+    except SQLAlchemyError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Database Error: {str(e.orig)}"
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected Error: {str(e)}"
+        )

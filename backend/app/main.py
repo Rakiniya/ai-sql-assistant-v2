@@ -3,8 +3,16 @@ from sqlalchemy import text
 from app.models.database import engine
 from app.routes.upload import router as upload_router
 from app.routes.chat import router as chat_router
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(upload_router)
 app.include_router(chat_router)

@@ -1,19 +1,39 @@
-def validate_sql(sql):
+import re
 
-    sql = sql.strip().upper()
+ALLOWED = ("select", "with")
 
-    forbidden = [
-        "INSERT",
-        "UPDATE",
-        "DELETE",
-        "DROP",
-        "ALTER",
-        "TRUNCATE",
-        "CREATE"
-    ]
+BLOCKED = [
+    "drop",
+    "delete",
+    "update",
+    "insert",
+    "alter",
+    "truncate",
+    "create",
+    "grant",
+    "revoke",
+    "execute",
+    "exec",
+    "merge",
+    "call"
+]
 
-    for keyword in forbidden:
-        if keyword in sql:
+
+def validate_sql(sql: str) -> bool:
+    if not sql:
+        return False
+
+    sql = sql.strip().lower()
+
+    sql = re.sub(r'--.*', '', sql)
+    sql = re.sub(r'/\*.*?\*/', '', sql, flags=re.S)
+    sql = sql.strip()          # <-- add this line
+
+    if not sql.startswith(ALLOWED):
+        return False
+
+    for keyword in BLOCKED:
+        if re.search(rf"\b{keyword}\b", sql):
             return False
 
-    return sql.startswith("SELECT") or sql.startswith("WITH")
+    return True

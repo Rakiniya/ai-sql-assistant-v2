@@ -1,12 +1,12 @@
 import os
 from dotenv import load_dotenv
-import google.generativeai as genai
+from groq import Groq
 
 load_dotenv()
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-model = genai.GenerativeModel("gemini-2.5-flash")
+client = Groq(
+    api_key=os.getenv("GROQ_API_KEY")
+)
 
 
 def generate_sql(question, table_name, columns):
@@ -22,18 +22,56 @@ Available Columns:
 
 Rules:
 1. Use ONLY the table name: {table_name}
-2. Use ONLY the columns listed above.
-3. Never invent column names.
+2. Use ONLY the columns above.
+3. Never invent columns.
 4. Generate ONLY PostgreSQL SELECT queries.
-5. Return ONLY SQL. Do not explain anything.
-6. Use LIMIT when the user asks for top records.
-7. If the question cannot be answered with the available columns, return:
-   ERROR: Required column not found.
+5. Return ONLY SQL.
+6. Use LIMIT for top records.
+7. If impossible, return:
+ERROR: Required column not found.
 
 User Question:
 {question}
 """
 
-    response = model.generate_content(prompt)
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0
+    )
 
-    return response.text.strip()
+    return response.choices[0].message.content.strip()
+
+
+def generate_insight(question, result):
+
+    prompt = f"""
+You are a data analyst.
+
+Question:
+{question}
+
+Result:
+{result}
+
+Give a business insight in 3-5 lines.
+"""
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        temperature=0.3
+    )
+
+    return response.choices[0].message.content.strip()
+
